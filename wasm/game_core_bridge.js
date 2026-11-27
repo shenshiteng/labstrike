@@ -63,6 +63,12 @@
     core_shot_blocked:     ['number', ['number', 'number', 'number', 'number']],
     core_ray_wall_dist:    ['number', ['number', 'number', 'number', 'number']],
 
+    /* 楼层数据（C++ 持有；JS data/floor-*.js 只是运行时镜像） */
+    core_floor_count:      ['number', []],
+    core_floor_id:         ['string', ['number']],
+    core_floor_file:       ['string', ['number']],
+    core_floor_script:     ['string', ['number']],
+
     /* 任务 2.0 */
     core_m2_start:         [null, ['number', 'number', 'number', 'number', 'number', 'number']],
     core_m2_set_target:    [null, ['number', 'number', 'number', 'number', 'number', 'number']],
@@ -151,6 +157,23 @@
   };
   api.rayWallDist = function (x0, z0, dx, dz, maxLen) {
     return api.ready ? api.fns.core_ray_wall_dist(x0, z0, dx, dz, maxLen) : null;
+  };
+
+  /* ---------- 楼层数据（C++ 唯一源） ---------- */
+  api.floorCount = function () { return api.ready ? api.fns.core_floor_count() : 0; };
+  api.floorAt = function (i) {
+    if (!api.ready) return null;
+    return { id: api.fns.core_floor_id(i), file: api.fns.core_floor_file(i),
+             script: api.fns.core_floor_script(i) };
+  };
+  /* 从 C++ 取回全部楼层脚本，页面可据此重建 FLOORS（线上无 data/ 目录时用） */
+  api.floorRegistry = function () {
+    var out = {};
+    if (!api.ready) return out;
+    for (var i = 0; i < api.fns.core_floor_count(); i++) {
+      out[api.fns.core_floor_id(i)] = api.fns.core_floor_script(i);
+    }
+    return out;
   };
 
   /* ---------- 玩家 ---------- */

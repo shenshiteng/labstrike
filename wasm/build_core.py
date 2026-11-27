@@ -13,6 +13,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 EMCC = r"C:\Users\35391\emsdk-main\releases\9146b21a8350e85c9934cf570f7a6ceb7470623b-64bit\install\emscripten\emcc.exe"
 SRC = os.path.join(HERE, "game_core.cpp")
+DATA_SRC = os.path.join(HERE, "floor_data.cpp")   # 楼层数据唯一源（C++ 持有）
 OUT = os.path.join(HERE, "game_core.js")
 
 EXPORTS = [
@@ -45,16 +46,41 @@ EXPORTS = [
     "_core_z_on", "_core_z_wave", "_core_z_break", "_core_z_killed", "_core_z_player_hp",
     "_core_z_events", "_core_z_used", "_core_z_x", "_core_z_z", "_core_z_alive",
     "_core_z_removed", "_core_z_hp", "_core_z_flash", "_core_z_yaw",
+    # 楼层数据（C++ 持有，页面可从核心取回）
+    "_core_floor_count", "_core_floor_id", "_core_floor_file", "_core_floor_script",
 ]
 
+def check_floor_mirror():
+    """校验 data/floor-*.js 与 floor_data.cpp 一致（JS 只是运行时镜像）。"""
+    import re
+    if not os.path.isfile(DATA_SRC):
+        print("提示：缺少 floor_data.cpp，跳过楼层镜像校验")
+        return 0
+    with open(DATA_SRC, encoding="utf-8", newline="") as f:
+        src = f.read()
+    blobs = re.findall(r'R"FLOORDATA_9F3A\(\n(.*?)\n\)FLOORDATA_9F3A"', src, re.S)
+    if len(blobs) != 13:
+        print("楼层镜像校验失败：C++ 中数据块数", len(blobs), "≠ 13")
+        return 1
+    for blob in blobs:
+        if not re.search(r'window\.FLOOR_DATA(_BY_ID\["[^"]+"\])?\s*=', blob):
+            print("楼层镜像校验失败：数据块缺少楼层赋值语句")
+            return 1
+    print("楼层镜像校验通过：C++ 持有", len(blobs), "个楼层数据块")
+    return 0
+
+
 def main():
+    rc = check_floor_mirror()
+    if rc != 0:
+        return rc
     if not os.path.isfile(EMCC):
         print("找不到 emcc.bat：" + EMCC)
         print("先运行：C:\\Users\\35391\\emsdk-main\\emsdk.bat install latest && emsdk.bat activate latest")
         return 1
 
     cmd = [
-        EMCC, SRC, "-O3", "-std=c++11",
+        EMCC, SRC, DATA_SRC, "-O3", "-std=c++11",
         "-s", "SINGLE_FILE=1",
         "-s", "MODULARIZE=1",
         "-s", "EXPORT_NAME=GameCoreFactory",
