@@ -9,3 +9,5 @@ models/*.glb           binary
 # emcc 编译产物 + 配套桥接代码（源在 wasm/game_core.cpp）
 wasm/game_core.js      linguist-generated
 wasm/game_core_bridge.js linguist-generated
+# 楼层运行时镜像（C++ floor_data.cpp 派生）
+data/floor-*.js linguist-generated
