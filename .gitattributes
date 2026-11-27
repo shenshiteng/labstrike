@@ -11,3 +11,5 @@ wasm/game_core.js      linguist-generated
 wasm/game_core_bridge.js linguist-generated
 # 楼层运行时镜像（C++ floor_data.cpp 派生）
 data/floor-*.js linguist-generated
+# C 作业源码：明确计入语言统计
+labstrike_range.c linguist-detectable=true
