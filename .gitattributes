@@ -1,0 +1,11 @@
+# GitHub Linguist: 第三方库、编译产物、二进制模型不计入项目语言统计。
+# 保留这些文件在仓库里（游戏运行需要），只影响语言占比和 diff 折叠。
+
+# 第三方库
+models/three.min.js    linguist-vendored
+models/GLTFLoader.js   linguist-vendored
+models/*.glb           binary
+
+# emcc 编译产物 + 配套桥接代码（源在 wasm/game_core.cpp）
+wasm/game_core.js      linguist-generated
+wasm/game_core_bridge.js linguist-generated

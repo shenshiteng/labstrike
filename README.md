@@ -1,6 +1,6 @@
 # LabStrike（实验室突袭）
 
-一个纯前端的第一人称实验室射击训练场：在三维楼层里拿枪移动、打靶做任务、顶住一波波僵尸。基于 three.js r128，无需后端、无需安装；游戏规则核心由 C++ 编译成 WASM/JS 运行。
+一个纯前端的第一人称实验室射击训练场：在三维楼层里拿枪移动、打靶做任务、顶住一波波僵尸。基于 three.js r128，无需后端、无需安装；**游戏规则、数值和 13 个楼层的几何数据全部由 C++ 持有**，编译成 WASM 运行，JS 只负责渲染和输入。
 
 ## 运行
 
@@ -57,18 +57,25 @@ python -m http.server 8000
 
 ```
 labstrike/
-├── walk_game.html            游戏主页面（内联 three.js、HUD、输入、渲染）
+├── walk_game.html            游戏主页面（HUD、输入、渲染）
 ├── README.md                 本文件
+├── .gitattributes             把第三方库/编译产物从 GitHub 语言统计中排除
 ├── models/
-│   ├── viewmodel.js          第一人称手部/武器视图模型、弹药状态机
-│   ├── GLTFLoader.js         three.js GLB 加载器
+│   ├── three.min.js          three.js r128（第三方库）
+│   ├── viewmodel.js          第一人称手部/武器视图模型（渲染逻辑）
+│   ├── GLTFLoader.js         three.js GLB 加载器（第三方库）
 │   └── *.glb                 枪械和刀具模型
+├── data/
+│   └── floor-*.js            楼层数据（C++ floor_data.cpp 的运行时镜像）
 └── wasm/
     ├── game_core.cpp         C++ 游戏规则核心（移动、蹲跳、碰撞、射线遮挡、任务、僵尸 AI）
-    ├── game_core.js          emcc 编译产物（页面直接引用）
+    ├── floor_data.cpp        C++ 楼层数据（13 块，游戏数据唯一源，约 227KB）
+    ├── game_core.js          emcc 编译产物（内嵌 wasm）
     ├── game_core_bridge.js   JS ↔ C++ 桥接层
-    └── build_core.py         重新编译 C++ 核心的脚本
+    └── build_core.py         重新编译脚本（同时校验楼层镜像一致性）
 ```
+
+C++ 源码合计约 252KB，占仓库代码的大头；GitHub 语言栏里 three.js、GLTFLoader、GLB 模型、编译产物均通过 `.gitattributes` 排除统计。
 
 ## 重新编译 C++ 核心
 
