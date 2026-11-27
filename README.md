@@ -1,6 +1,8 @@
 # LabStrike（实验室突袭）
 
-一个纯前端的第一人称实验室射击训练场：在三维楼层里拿枪移动、打靶做任务、顶住一波波僵尸。基于 three.js r128，无需后端、无需安装；**游戏规则、数值和 13 个楼层的几何数据全部由 C++ 持有**，编译成 WASM 运行，JS 只负责渲染和输入。
+一个第一人称实验室射击训练场：在三维楼层里拿枪移动、打靶做任务、顶住一波波僵尸。基于 three.js r128，无需后端、无需安装；**游戏规则、数值和 13 个楼层的几何数据全部由 C++ 持有**，编译成 WASM 运行，JS 只负责渲染和输入。
+
+仓库同时提供一个**纯 C99 命令行靶场模拟器** `labstrike_range.c`，用 `gcc` 可直接编译运行，不需要浏览器或图形环境。
 
 ## 运行
 
@@ -58,6 +60,7 @@ python -m http.server 8000
 ```
 labstrike/
 ├── walk_game.html            游戏主页面（HUD、输入、渲染）
+├── labstrike_range.c         C99 命令行靶场模拟器（gcc 直接编译运行）
 ├── README.md                 本文件
 ├── .gitattributes             把第三方库/编译产物从 GitHub 语言统计中排除
 ├── models/
@@ -77,7 +80,35 @@ labstrike/
 
 C++ 源码合计约 252KB，占仓库代码的大头；GitHub 语言栏里 three.js、GLTFLoader、GLB 模型、编译产物均通过 `.gitattributes` 排除统计。
 
-## 重新编译 C++ 核心
+## C 语言命令行程序（labstrike_range.c）
+
+纯 C99、零第三方依赖，只需要一个 C 编译器。用 `gcc` 编译并运行：
+
+```bash
+gcc -std=c99 -O2 labstrike_range.c -o labstrike_range -lm
+./labstrike_range demo
+```
+
+`demo` 会自动打完一轮 5 个靶并打印最终结果。不带参数则进入交互模式：
+
+```bash
+./labstrike_range
+```
+
+交互模式下输入 `h` 看全部命令，常用流程：
+
+```
+range> m 1               开始限时命中任务
+range> w 2               换武器（1 手枪 / 2 Glock / 3 步枪 / 4 霰弹枪）
+range> s                 看靶位坐标
+range> f -0.70 -3.61     朝该坐标开枪
+range> r                 换弹
+range> q                 退出
+```
+
+内置 5 种任务（限时命中 / 移动靶 / 爆头 / 顺序靶 / 综合），规则和网页版一致：弹药有限、命中判定有散布、移动靶要先用 `t <秒>` 推进时间、爆头任务开枪时加 `head`、顺序靶必须按编号打。
+
+## 重新编译网页版的 C++ 核心
 
 需要本机装好 emsdk（`emcc` 可用），然后在项目根目录执行：
 
@@ -91,5 +122,3 @@ python nav3d/wasm/build_core.py
 
 - 场景楼层来自本项目的第一人称漫游地图；游戏规则与页面只在本仓库内维护，不影响原导航页面。
 - 模型来自公开免费素材站（Poly Pizza 等），仅用于本地演示。
-
-> 核心规则由 C++ 编译为 WASM 运行；本页语言统计以 C++ 为主体。
