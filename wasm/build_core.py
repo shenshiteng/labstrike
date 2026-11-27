@@ -29,6 +29,22 @@ EXPORTS = [
     "_core_mission_active", "_core_mission_type", "_core_mission_done", "_core_mission_failed",
     "_core_mission_hit", "_core_mission_total", "_core_mission_time", "_core_mission_time_left",
     "_core_target_alive", "_core_target_hp", "_core_target_kind", "_core_target_x", "_core_target_z",
+    # 地图碰撞 / 射线遮挡
+    "_core_init_world", "_core_set_pr", "_core_add_walk", "_core_add_col",
+    "_core_world_walk_count", "_core_world_col_count",
+    "_core_free", "_core_shot_blocked", "_core_ray_wall_dist",
+    # 任务 2.0（页面主路径：清场 / 限时 / 顺序 / 移动靶 / 爆头）
+    "_core_m2_start", "_core_m2_set_target", "_core_m2_step", "_core_m2_hit",
+    "_core_m2_active", "_core_m2_done", "_core_m2_failed", "_core_m2_hit_count",
+    "_core_m2_total", "_core_m2_seq", "_core_m2_type", "_core_m2_time", "_core_m2_time_left",
+    "_core_m2_target_alive", "_core_m2_target_kind", "_core_m2_target_x", "_core_m2_target_z",
+    # 僵尸波次 AI
+    "_core_z_reset", "_core_z_stop",
+    "_core_z_wave_count", "_core_z_wave_dmg", "_core_z_wave_speed", "_core_z_wave_hp", "_core_z_wave_color",
+    "_core_z_add", "_core_z_step", "_core_z_hit",
+    "_core_z_on", "_core_z_wave", "_core_z_break", "_core_z_killed", "_core_z_player_hp",
+    "_core_z_events", "_core_z_used", "_core_z_x", "_core_z_z", "_core_z_alive",
+    "_core_z_removed", "_core_z_hp", "_core_z_flash", "_core_z_yaw",
 ]
 
 def main():
